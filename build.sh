@@ -72,8 +72,8 @@ function precheck() {
     ok=1
   fi
 
-  if [[ $(go version | egrep "go1[.][012345678]") ]]; then
-    echo "go version is too low. Must use 1.9 or above"
+  if ! go version | egrep -q 'go(1\.1[234])' ; then
+    echo "go version must be 1.12 or above"
     ok=1
   fi
 
@@ -100,7 +100,7 @@ function oinstall() {
   prefix="$2"
 
   cd  $mydir
-  gofmt -s -w  go/
+  gofmt -s -w pkg/
   cp ./resources/etc/init.d/freno $builddir/freno/etc/init.d/freno
   chmod +x $builddir/freno/etc/init.d/freno
   cp ./resources/freno.conf.skeleton.json $builddir/freno/etc/freno.conf.json
@@ -143,7 +143,7 @@ function build() {
   prefix="$4"
   ldflags="-X main.AppVersion=${RELEASE_VERSION} -X main.GitCommit=${GIT_COMMIT}"
   echo "Building via $(go version)"
-  gobuild="go build -i ${opt_race} -ldflags \"$ldflags\" -o $builddir/freno${prefix}/freno go/cmd/freno/main.go"
+  gobuild="go build -i ${opt_race} -ldflags \"$ldflags\" -o $builddir/freno${prefix}/freno cmd/freno/main.go"
 
   case $os in
     'linux')
